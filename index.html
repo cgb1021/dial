@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="ZH-cn">
+<head>
+<meta charset="utf-8">
+<title>足够HIGH,玩转欧洲杯 转一转，赢大奖！</title>
+<meta name="viewport" content="width=device-width, height=device-height,initial-scale=1.0,user-scalable=no, maximum-scale=1.0,minimum-scale=0.5">
+<meta name="keywords" content="keyword1,keyword23">
+<meta name="description" content="网站介绍">
+<meta name="author" content="48838096@qq.com">
+<link type="text/css" rel="stylesheet" href="style.css">
+<script>
+var documentHeight = Math.max(document.documentElement.clientHeight,document.documentElement.clientWidth);
+var documentWidth = Math.min(document.documentElement.clientHeight,document.documentElement.clientWidth);
+</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="module title"></div>
+  <div class="dial"><canvas id="dial"></canvas><form action="/index.php/lottery/" method="post" id="lottery_send">
+          <input type="hidden" name="token" value="1464571144UdwvScWv2MLG73IwQs1rMdZyWqFoK3x8fPOjk8ipsrI=">
+          <input type="hidden" name="store_no" value="0">
+          <input type="submit" id="dial_start" value="">
+      </form></div>
+</div>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="dial.js"></script> 
+<script>
+$(function(){
+	var myDial = dial({canvasId:"dial",
+				duration: 1000,
+				round: 5,
+				durationStep: .5,
+				length: 6,
+				degree: 0.0833333333333333,
+				width: documentWidth*0.828, 
+				height: documentWidth*0.828,
+				image: "dial.png",
+				onready: function() {
+					console.log('ready');
+				}
+			});
+	document.getElementById('lottery_send').addEventListener('submit', function(e){
+		e.preventDefault();
+		
+		myDial.degree = 0;
+		myDial.start(Math.floor(Math.random()*5));
+		return;
+	});
+});
+</script>
+</body>
+</html>

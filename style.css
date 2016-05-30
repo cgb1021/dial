@@ -1,0 +1,48 @@
+/* theme style */
+html, body {
+	height:100%;
+}
+html {
+    font-size: 100%;
+}
+.module {
+	height:0;
+	position:relative;
+	width:100%;
+}
+.module>div {
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+.wrap {
+	background:#2a6722;
+	width:100%;
+	height:100%;
+}
+.title {
+	padding-top:57.6%; /*432*/
+}
+.dial {
+	/*padding-top:82.8%;*/ /*621*/
+	text-align:center;
+	margin-bottom:5.6%; /*42*/
+	position:relative;
+}
+#dial_start {
+	display:block;
+	width:19.33333333333333%; /*145*/
+	padding-top:19.33333333333333%;
+	height:0;
+	position:absolute;
+	z-index:2;
+	top:50%;
+	left:50%;
+	-webkit-transform: translate(-50%, -50%);
+	-moz-transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	opacity:0;
+}
