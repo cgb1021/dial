@@ -28,9 +28,8 @@ var documentWidth = Math.min(document.documentElement.clientHeight,document.docu
 <script>
 $(function(){
 	myDial = dial({canvasId:"dial",
-				duration: 1000,
-				round: 4,
-				durationStep: 0,
+				duration: 500,
+				round: 5,
 				length: 6,
 				degree: 0,
 				width: documentWidth*0.828, 
@@ -39,6 +38,10 @@ $(function(){
 				onready: function() {
 					console.log('ready');
 				},
+				onroundend: function() {
+					this.roundDuration = (1+.5)*this.roundDuration;
+					console.log(this.roundDuration);
+				},
 				onend: function() {
 					console.log('onend');
 				}
@@ -46,10 +49,14 @@ $(function(){
 	document.getElementById('lottery_send').addEventListener('submit', function(e){
 		e.preventDefault();
 		
-		//myDial.degree = 0;
-		var index = Math.floor(Math.random()*5);
-		myDial.start(index);
-		return;
+		if(myDial.state == 2) {
+			myDial.stop();
+		} else {
+			//myDial.degree = 0;
+			var index = Math.floor(Math.random()*5);
+			console.log(index+1);
+			myDial.start(index);
+		}
 	});
 });
 </script>
