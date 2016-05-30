@@ -23,10 +23,9 @@ var documentWidth = Math.min(document.documentElement.clientHeight,document.docu
           <input type="submit" id="dial_start" value="">
       </form></div>
 </div>
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<!--script src="https://code.jquery.com/jquery-2.2.4.min.js"></script-->
 <script src="dial.js"></script> 
 <script>
-$(function(){
 	myDial = dial({canvasId:"dial",
 				duration: 500,
 				round: 5,
@@ -58,7 +57,6 @@ $(function(){
 			myDial.start(index);
 		}
 	});
-});
 </script>
 </body>
 </html>
