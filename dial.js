@@ -6,7 +6,7 @@
  * date: 2016.05.30
  *
  * 初始化参数说明
- *  option {canvasId:"dial", //canvas id
+ * option {canvasId:"dial", //canvas id
  			duration: 500, //每一圈运行时长
  			round: 5, //运行圈数
  			length: 6, //奖品区间数量
