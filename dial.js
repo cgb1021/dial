@@ -84,6 +84,7 @@ function Dial(option) {
 	this.index = 0;
 	this.finishDegree = 0;
 	this.counter = 0;
+	this.animationId = 0;
 	// 设置高宽度和获取context
 	this.ctx = canvas.getContext('2d');
 	this.ctx.translate(this.width/2, this.height/2);
@@ -113,9 +114,17 @@ function Dial(option) {
 }
 Dial.prototype.reset = function() {
 	this.state = 1; //运行状态.0:未初始化,1:初始化完毕,2:运行中
+	try {
+		this.ctx.restore();
+	} catch(e) {
+		console.log(e)
+	}
+	if(this.animationId)
+		window.cancelAnimationFrame(this.animationId);
 	// 画背景和指针
 	var x = -this.width/2, y = -this.height/2;
 	try {
+		this.ctx.clearRect(x, y, this.width, this.height);
 		// 画背景
 		this.ctx.drawImage(this.image, 0, 0, this.image.width/2, this.image.height, x, y, this.width, this.height);
 		// 画指针
@@ -196,7 +205,7 @@ Dial.prototype.start = function(index) {
 
 		// console.log(rounds , _this.rounds , degree , this.finishDegree);
 		if(!isEnd)
-			window.requestAnimationFrame(arguments.callee);
+			this.animationId = window.requestAnimationFrame(arguments.callee);
 	};
 	draw();
 };
