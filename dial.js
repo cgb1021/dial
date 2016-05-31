@@ -15,12 +15,13 @@
  			height: documentWidth*0.828, //canvas 高度
  			image: "dial.png", //转盘UI背景图
  			onready: function() {}, //初始化完毕事件（图片加载完毕）
- 			onroundend: function() {this.roundDuration = (1+.5)*this.roundDuration;}, //每一圈执行完毕
+ 			onroundend: function() {this.currentDuration = (1+.5)*this.currentDuration;}, //每一圈执行完毕
  			onend: function() {} //整个动画执行完毕
  			}
  * 对象属性说明
  * ctx: CanvasRenderingContext2D //canvas context
    degree: 0 //初始化角度
+   finishDegree:0 //结束角度
    duration: 500 //初始化每圈时长
    event: Object //事件 onready,onend,onroundend
    height: 310.5 //canvas 高度
@@ -28,7 +29,7 @@
    index: 0 //当前指针指向区间
    length: 6 //区间个数（礼物个数）
    round: 5 //转动圈数
-   roundDuration: 0 //每圈执行时长
+   currentDuration: 0 //每圈执行时长
    state: 1 //状态，0,未初始化;1,初始化完毕;2,执行中
    width:310.5 //canvas 宽度
  *
@@ -75,11 +76,13 @@ function Dial(option) {
 	this.width = canvas.width = option.width || document.documentElement.clientWidth;
 	this.height = canvas.height = option.height || document.documentElement.clientWidth;
 	this.duration = option.duration || 2000; //每一圈执行（初始化）
-	this.round = option.round || 3; //运行圈数
+	this.rounds = option.rounds || 3; //运行圈数
 	this.length = parseInt(option.length, 10); //区间个数
 	this.degree = option.degree || 0; //起始角度
-	this.roundDuration = 0; //每一圈执行时长
+	this.currentDuration = 0; //每一圈执行时长
 	this.index = 0;
+	this.finishDegree = 0;
+	this.counter = 0;
 	// 设置高宽度和获取context
 	this.ctx = canvas.getContext('2d');
 	this.ctx.translate(this.width/2, this.height/2);
@@ -125,37 +128,44 @@ Dial.prototype.start = function(index) {
 	if(this.state == 2) {
 		return;
 	}
-
-	index = index%this.length;
+	this.state = 2;
 
 	// console.log('start');
 	var _this = this,
 		x = -this.width/2, //开始x坐标
 		y = -this.height/2, //开始y坐标
 		startTime = Date.now(), //每圈开始时间
-		totalDegree = this.degree,
-		endDegree = this.round + (index +.5)/this.length; //结束角度
+		totalDegree = this.degree;
 
-	this.state = 2;
-	this.roundDuration = this.duration; //每圈转动时长
+	if(index != undefined) {
+		//结束角度
+		this.finishDegree = this.rounds + (index%this.length +.5)/this.length;
+		console.log('this.finishDegree', this.finishDegree)
+	} else {
+		this.finishDegree = -1;
+	}
+
+	this.counter = 0;
+	this.currentDuration = this.duration; //每圈转动时长
 
 	function draw() {
 		var time = Date.now(),
-			degree = (time-startTime)/_this.roundDuration,
+			degree = (time-startTime)/_this.currentDuration,
 			isEnd = false;
 
 		if(degree >= 1) {
+			_this.counter++;
 			//单圈结束条件
 			startTime = time;
 			degree = totalDegree += 1;
 
 			if(_this.event.onroundend)
 				_this.event.onroundend();
-			//console.log('end1', degree , endDegree, _this.index, index);
+			//console.log('end1', degree , this.finishDegree, _this.index, index);
 		} else
 			degree = totalDegree + degree;
 
-		if(degree >= endDegree || _this.state == 1) {
+		if((_this.finishDegree> -1 && degree >= _this.finishDegree) || _this.state == 1) {
 			// 动画结束条件
 			if(_this.state == 1) {
 				//主动结束
@@ -164,13 +174,13 @@ Dial.prototype.start = function(index) {
 			} else {
 				//自然结束
 				_this.state = 1;
-				degree = _this.degree = endDegree%1;
+				degree = _this.degree = _this.finishDegree%1;
 			}
 
 			if(_this.event.onend)
 				_this.event.onend();
 			isEnd = true;
-			//console.log('end2', degree , endDegree, _this.index, index);
+			//console.log('end2', degree , this.finishDegree, _this.index, index);
 		} else
 			degree = degree%1;
 
@@ -183,14 +193,18 @@ Dial.prototype.start = function(index) {
 		_this.ctx.drawImage(_this.image, _this.image.width/2, 0, _this.image.width/2, _this.image.height, x, y, _this.width, _this.height);
 		_this.ctx.restore();
 
-		// console.log(round , _this.round , degree , endDegree);
+		// console.log(rounds , _this.rounds , degree , this.finishDegree);
 		if(!isEnd)
 			window.requestAnimationFrame(arguments.callee);
 	};
 	draw();
 };
-Dial.prototype.stop = function() {
-	this.state = 1;
+Dial.prototype.stop = function(index) {
+	if(index != undefined) {
+		//结束角度
+		this.finishDegree = this.counter+this.rounds + (index%this.length +.5)/this.length;
+	} else
+		this.state = 1;
 }
 window.dial = function(option) {
 	return new Dial(option);

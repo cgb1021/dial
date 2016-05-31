@@ -23,12 +23,12 @@ var documentWidth = Math.min(document.documentElement.clientHeight,document.docu
           <input type="submit" id="dial_start" value="">
       </form></div>
 </div>
-<!--script src="https://code.jquery.com/jquery-2.2.4.min.js"></script-->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script src="dial.js"></script> 
 <script>
 	myDial = dial({canvasId:"dial",
 				duration: 500,
-				round: 5,
+				rounds: 3,
 				length: 6,
 				degree: 0,
 				width: documentWidth*0.828, 
@@ -38,25 +38,42 @@ var documentWidth = Math.min(document.documentElement.clientHeight,document.docu
 					console.log('ready');
 				},
 				onroundend: function() {
-					this.roundDuration = (1+.5)*this.roundDuration;
-					console.log(this.roundDuration);
+					if(this.finishDegree > -1) {
+						this.currentDuration = (1+.5)*this.currentDuration;
+						//console.log(this.currentDuration);
+					}
 				},
 				onend: function() {
 					console.log('onend');
 				}
 			});
+	/*同步模式
 	document.getElementById('lottery_send').addEventListener('submit', function(e){
 		e.preventDefault();
 		
 		if(myDial.state == 2) {
 			myDial.stop();
 		} else {
-			//myDial.degree = 0;
-			var index = Math.floor(Math.random()*5);
-			console.log(index+1);
-			myDial.start(index);
+			$.get('result.php?length=6', function(data){
+				console.log('抽奖结果:',data);
+				myDial.start(data);
+			});
 		}
-	});
+	});*/
+	/*异步模式*/
+	document.getElementById('lottery_send').addEventListener('submit', function(e){
+		e.preventDefault();
+		
+		if(myDial.state == 2) {
+			myDial.stop();
+			return;
+		}
+		myDial.start();
+		$.get('result.php?length=6', function(data){
+			console.log('抽奖结果:',data);
+			myDial.stop(data);
+		});
+	})
 </script>
 </body>
 </html>
