@@ -140,7 +140,7 @@ Dial.prototype.start = function(index) {
 	if(index != undefined) {
 		//结束角度
 		this.finishDegree = this.rounds + (index%this.length +.5)/this.length;
-		console.log('this.finishDegree', this.finishDegree)
+		//console.log('this.finishDegree', this.finishDegree)
 	} else {
 		this.finishDegree = -1;
 	}
