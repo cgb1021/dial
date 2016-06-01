@@ -114,11 +114,7 @@ function Dial(option) {
 }
 Dial.prototype.reset = function() {
 	this.state = 1; //运行状态.0:未初始化,1:初始化完毕,2:运行中
-	try {
-		this.ctx.restore();
-	} catch(e) {
-		console.log(e)
-	}
+	
 	if(this.animationId)
 		window.cancelAnimationFrame(this.animationId);
 	// 画背景和指针
@@ -205,7 +201,7 @@ Dial.prototype.start = function(index) {
 
 		// console.log(rounds , _this.rounds , degree , this.finishDegree);
 		if(!isEnd)
-			this.animationId = window.requestAnimationFrame(arguments.callee);
+			_this.animationId = window.requestAnimationFrame(arguments.callee);
 	};
 	draw();
 };
