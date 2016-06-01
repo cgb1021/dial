@@ -25,6 +25,7 @@
    degree: 0 //初始化角度
    duration: 500 //初始化每圈时长
    event: Object //事件 onready,onend,onroundend
+   finishDegree: 初始化角度
    finishDegree:0 //结束角度
    height: 310.5 //canvas 高度
    image: img //转盘UI背景图
@@ -40,8 +41,9 @@
    reset() //重置
  */
 
+;
 (function(window){
-// "use strict"
+ "use strict"
 	var prefixs = ['webkit', 'moz', 'ms', 'o']; //浏览器前缀
 	if (!window.requestAnimationFrame) {
 		for (var i = 0; i < prefixs.length; i++) {
@@ -79,15 +81,12 @@ function Dial(option) {
 	this.duration = option.duration || 2000; //每一圈执行（初始化）
 	this.rounds = option.rounds || 3; //运行圈数
 	this.length = parseInt(option.length, 10); //区间个数
-	this.degree = option.degree || 0; //起始角度
-	this.currentDuration = 0; //每一圈执行时长
-	this.index = 0;
-	this.finishDegree = 0;
-	this.counter = 0;
-	this.animationId = 0;
+	this.startDegree = option.degree || 0; //起始角度
+
 	// 设置高宽度和获取context
 	this.ctx = canvas.getContext('2d');
 	this.ctx.translate(this.width/2, this.height/2);
+	this.state = 0;
 	//设置event
 	this.event = {};
 	if(typeof option.onready == 'function')
@@ -111,12 +110,17 @@ function Dial(option) {
 		_this.reset();
 	};
 	this.image.src = option.image;
-}
+};
 Dial.prototype.reset = function() {
-	this.state = 1; //运行状态.0:未初始化,1:初始化完毕,2:运行中
-	
+	this.state = 1; //运行状态 0:未初始化,1:正常状态(初始化完毕),2:运行中(转动中),3:准备停止(调用stop方法)
 	if(this.animationId)
 		window.cancelAnimationFrame(this.animationId);
+	//重置属性
+	this.degree = this.startDegree;
+	this.index = 0; //当前区间
+	this.finishDegree = -1; //结束角度
+	this.counter = 0; //
+	this.animationId = 0; //定时器id
 	// 画背景和指针
 	var x = -this.width/2, y = -this.height/2;
 	try {
@@ -128,10 +132,10 @@ Dial.prototype.reset = function() {
 	} catch(e) {
 		alert(e.message)
 	}
-	
-}
+};
 Dial.prototype.start = function(index) {
-	if(this.state == 2) {
+	if(this.state !== 1) {
+		//非正常状态 返回 (未初始化或者运行中)
 		return;
 	}
 	this.state = 2;
@@ -140,19 +144,18 @@ Dial.prototype.start = function(index) {
 	var _this = this,
 		x = -this.width/2, //开始x坐标
 		y = -this.height/2, //开始y坐标
-		startTime = Date.now(), //每圈开始时间
-		totalDegree = this.degree;
+		startTime = Date.now(); //每圈开始时间
 
 	if(index != undefined) {
-		//结束角度
+		//计算结束角度
 		this.finishDegree = this.rounds + (index%this.length +.5)/this.length;
 		//console.log('this.finishDegree', this.finishDegree)
 	} else {
 		this.finishDegree = -1;
 	}
 
-	this.counter = 0;
-	this.currentDuration = this.duration; //每圈转动时长
+	this.counter = 0; //当前是第几圈
+	this.currentDuration = this.duration; //每一圈执行时长
 
 	function draw() {
 		var time = Date.now(),
@@ -160,32 +163,22 @@ Dial.prototype.start = function(index) {
 			isEnd = false;
 
 		if(degree >= 1) {
-			_this.counter++;
 			//单圈结束条件
+			_this.counter++;
 			startTime = time;
-			degree = totalDegree += 1;
+			degree = _this.degree += 1;
 
 			if(_this.event.onroundend)
 				_this.event.onroundend();
 			//console.log('end1', degree , this.finishDegree, _this.index, index);
 		} else
-			degree = totalDegree + degree;
+			degree = _this.degree + degree;
 
-		if((_this.finishDegree> -1 && degree >= _this.finishDegree) || _this.state == 1) {
+		if(_this.finishDegree> -1 && degree >= _this.finishDegree) {
 			// 动画结束条件
-			if(_this.state == 1) {
-				//主动结束
-				_this.index = Math.floor((degree%1)*_this.length);
-				degree = _this.degree = (_this.index +.5)/_this.length;
-			} else {
-				//自然结束
-				_this.state = 1;
-				degree = _this.degree = _this.finishDegree%1;
-			}
-
-			if(_this.event.onend)
-				_this.event.onend();
+			_this.state = 1;
 			isEnd = true;
+			degree = _this.degree = _this.finishDegree%1;
 			//console.log('end2', degree , this.finishDegree, _this.index, index);
 		} else
 			degree = degree%1;
@@ -201,18 +194,29 @@ Dial.prototype.start = function(index) {
 
 		// console.log(rounds , _this.rounds , degree , this.finishDegree);
 		if(!isEnd)
-			_this.animationId = window.requestAnimationFrame(arguments.callee);
+			_this.animationId = window.requestAnimationFrame(draw);
+		else
+			_this.event.onend();
 	};
 	draw();
 };
 Dial.prototype.stop = function(index) {
+	if(this.state !== 2) {
+		//非运行状态 返回
+		return;
+	}
+
+	this.state = 3;
 	if(index != undefined) {
-		//结束角度
-		this.finishDegree = this.counter+this.rounds + (index%this.length +.5)/this.length;
-	} else
-		this.state = 1;
-}
+		//计算结束角度
+		this.finishDegree = this.counter + this.rounds + (index%this.length +.5)/this.length;
+	} else {
+		this.finishDegree = (this.index +.5)/this.length;
+	}
+};
+
 window.dial = function(option) {
 	return new Dial(option);
-}
+};
+
 })(window);

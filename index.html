@@ -26,7 +26,7 @@ var documentWidth = Math.min(document.documentElement.clientHeight,document.docu
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script src="dial.js"></script> 
 <script>
-	myDial = dial({canvasId:"dial",
+var	myDial = dial({canvasId:"dial",
 				duration: 500,
 				rounds: 3,
 				length: 6,
@@ -40,7 +40,6 @@ var documentWidth = Math.min(document.documentElement.clientHeight,document.docu
 				onroundend: function() {
 					if(this.finishDegree > -1) {
 						this.currentDuration = (1+.5)*this.currentDuration;
-						//console.log(this.currentDuration);
 					}
 				},
 				onend: function() {
@@ -64,15 +63,20 @@ var documentWidth = Math.min(document.documentElement.clientHeight,document.docu
 	document.getElementById('lottery_send').addEventListener('submit', function(e){
 		e.preventDefault();
 		
-		if(myDial.state == 2) {
+		if(myDial.state === 2) {
 			myDial.stop();
 			return;
 		}
+		//if(myDial.state !== 1)
+		//	return;
 		myDial.start();
 		$.get('result.php?length=6', function(data){
 			console.log('抽奖结果:',data);
-			myDial.stop(data);
-		});
+			if(data.status)
+				myDial.stop(data.result); //正常的抽奖结果
+			else
+				myDial.reset(); //模拟服务器出错 重置转盘
+		}, 'json');
 	})
 	console.log(myDial);
 </script>
