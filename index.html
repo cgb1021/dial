@@ -55,8 +55,11 @@ var	myDial = dial({canvasId:"dial",
 		} else {
 			$.get('result.php?length=6', function(data){
 				console.log('抽奖结果:',data);
-				myDial.start(data);
-			});
+				if(data.status)
+					myDial.start(data.result); //正常的抽奖结果
+				else
+					myDial.reset(); //模拟服务器出错 重置转
+			}, 'json');
 		}
 	});*/
 	/*异步模式*/

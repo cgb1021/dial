@@ -13,7 +13,7 @@
  			degree: 0, //初始化角度
  			width: documentWidth*0.828, //canvas 宽度
  			height: documentWidth*0.828, //canvas 高度
- 			image: "dial.png", //转盘UI背景图
+ 			image: "dial.png", //转盘UI背景图 雪碧图中，第一个位置是背景，第二个位置是指针（转动的对象）
  			onready: function() {}, //初始化完毕事件（图片加载完毕）
  			onroundend: function() {this.currentDuration = (1+.5)*this.currentDuration;}, //每一圈执行完毕
  			onend: function() {} //整个动画执行完毕
