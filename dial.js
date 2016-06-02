@@ -13,7 +13,7 @@
  			degree: 0, //初始化角度
  			width: documentWidth*0.828, //canvas 宽度
  			height: documentWidth*0.828, //canvas 高度
- 			image: "dial.png", //转盘UI背景图 雪碧图中，第一个位置是背景，第二个位置是指针（转动的对象）
+ 			image: "dial.png", //转盘UI背景图 雪碧图中，第一个位置是指针（要求是正方形），第二个位置是背景
  			onready: function() {}, //初始化完毕事件（图片加载完毕）
  			onroundend: function() {this.currentDuration = (1+.5)*this.currentDuration;}, //每一圈执行完毕
  			onend: function() {} //整个动画执行完毕
@@ -86,6 +86,7 @@ function Dial(option) {
 	this.rounds = option.rounds || 3; //运行圈数
 	this.length = parseInt(option.length, 10); //区间个数
 	this.startDegree = option.degree || 0; //起始角度
+	canvas.style.cssText = 'background-image:url('+option.image+'); background-size:auto 100%; background-repeat:no-repeat; background-position:100% top;';
 
 	// 设置高宽度和获取context
 	this.ctx = canvas.getContext('2d');
@@ -130,9 +131,9 @@ Dial.prototype.reset = function() {
 	try {
 		this.ctx.clearRect(x, y, this.width, this.height);
 		// 画背景
-		this.ctx.drawImage(this.image, this.image.width/2, 0, this.image.width/2, this.image.height, x, y, this.width, this.height);
+		//this.ctx.drawImage(this.image, this.image.width/2, 0, this.image.width/2, this.image.height, x, y, this.width, this.height);
 		// 画指针
-		this.ctx.drawImage(this.image, 0, 0, this.image.width/2, this.image.height, x, y, this.width, this.height);
+		this.ctx.drawImage(this.image, 0, 0, this.image.height, this.image.height, x, y, this.width, this.height);
 	} catch(e) {
 		alert(e.message)
 	}
@@ -191,9 +192,9 @@ Dial.prototype.start = function(index) {
 		// 开始画指针
 		_this.ctx.save();
 		_this.ctx.clearRect(x, y, _this.width, _this.height);
-		_this.ctx.drawImage(_this.image, _this.image.width/2, 0, _this.image.width/2, _this.image.height, x, y, _this.width, _this.height);
+		//_this.ctx.drawImage(_this.image, _this.image.width/2, 0, _this.image.width/2, _this.image.height, x, y, _this.width, _this.height);
 		_this.ctx.rotate(degree*Math.PI*2);
-		_this.ctx.drawImage(_this.image, 0, 0, _this.image.width/2, _this.image.height, x, y, _this.width, _this.height);
+		_this.ctx.drawImage(_this.image, 0, 0, _this.image.height, _this.image.height, x, y, _this.width, _this.height);
 		_this.ctx.restore();
 
 		// console.log(rounds , _this.rounds , degree , this.finishDegree);
