@@ -43,22 +43,26 @@
 
 ;
 (function(window){
- "use strict"
+ 	"use strict"
 	var prefixs = ['webkit', 'moz', 'ms', 'o']; //浏览器前缀
+	var requestAnimationFrame, cancelAnimationFrame;
 	if (!window.requestAnimationFrame) {
 		for (var i = 0; i < prefixs.length; i++) {
 			if (window[prefixs[i] + 'RequestAnimationFrame']) {
-				window.requestAnimationFrame = requestAnimationFrame = window[prefixs[i] + 'RequestAnimationFrame'];
-				window.cancelAnimationFrame = cancelAnimationFrame = window[prefixs[i] + 'CancelAnimationFrame'];
+				requestAnimationFrame = window[prefixs[i] + 'RequestAnimationFrame'];
+				cancelAnimationFrame = window[prefixs[i] + 'CancelAnimationFrame'];
 				break;
 			}
 		}
 		if(!window.requestAnimationFrame) {
-			window.requestAnimationFrame = requestAnimationFrame = function(fn) {
+			requestAnimationFrame = function(fn) {
 				window.setTimeout(fn,1000/60);
 			}
-			window.cancelAnimationFrame = cancelAnimationFrame = window.clearTimeout;
+			cancelAnimationFrame = window.clearTimeout;
 		}
+	} else {
+		requestAnimationFrame = window.requestAnimationFrame;
+		cancelAnimationFrame = window.cancelAnimationFrame;
 	}
 /*
  * @param object option
@@ -126,9 +130,9 @@ Dial.prototype.reset = function() {
 	try {
 		this.ctx.clearRect(x, y, this.width, this.height);
 		// 画背景
-		this.ctx.drawImage(this.image, 0, 0, this.image.width/2, this.image.height, x, y, this.width, this.height);
-		// 画指针
 		this.ctx.drawImage(this.image, this.image.width/2, 0, this.image.width/2, this.image.height, x, y, this.width, this.height);
+		// 画指针
+		this.ctx.drawImage(this.image, 0, 0, this.image.width/2, this.image.height, x, y, this.width, this.height);
 	} catch(e) {
 		alert(e.message)
 	}
@@ -187,9 +191,9 @@ Dial.prototype.start = function(index) {
 		// 开始画指针
 		_this.ctx.save();
 		_this.ctx.clearRect(x, y, _this.width, _this.height);
-		_this.ctx.drawImage(_this.image, 0, 0, _this.image.width/2, _this.image.height, x, y, _this.width, _this.height);
-		_this.ctx.rotate(degree*Math.PI*2);
 		_this.ctx.drawImage(_this.image, _this.image.width/2, 0, _this.image.width/2, _this.image.height, x, y, _this.width, _this.height);
+		_this.ctx.rotate(degree*Math.PI*2);
+		_this.ctx.drawImage(_this.image, 0, 0, _this.image.width/2, _this.image.height, x, y, _this.width, _this.height);
 		_this.ctx.restore();
 
 		// console.log(rounds , _this.rounds , degree , this.finishDegree);
