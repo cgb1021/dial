@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="ZH-cn">
+<head>
+<meta charset="utf-8">
+<title>足够HIGH,玩转欧洲杯 转一转，赢大奖！</title>
+<meta name="viewport" content="width=device-width, height=device-height,initial-scale=1.0,user-scalable=no, maximum-scale=1.0,minimum-scale=0.5">
+<meta name="keywords" content="keyword1,keyword23">
+<meta name="description" content="网站介绍">
+<meta name="author" content="48838096@qq.com">
+<link type="text/css" rel="stylesheet" href="style.css">
+<script>
+var documentHeight = Math.max(document.documentElement.clientHeight,document.documentElement.clientWidth);
+var documentWidth = Math.min(document.documentElement.clientHeight,document.documentElement.clientWidth);
+</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="module title"></div>
+  <div class="dial"><div class="pointer"></div><canvas id="dial"></canvas><form action="/index.php/lottery/" method="post" id="lottery_send">
+          <input type="hidden" name="token" value="1464571144UdwvScWv2MLG73IwQs1rMdZyWqFoK3x8fPOjk8ipsrI=">
+          <input type="hidden" name="store_no" value="0">
+          <input type="submit" id="dial_start" value="">
+      </form></div>
+</div>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="dial.js"></script> 
+<script>
+var	myDial = dial({canvasId:"dial",
+				duration: 500,
+				rounds: 3,
+				length: 6,
+				degree: 0,
+				width: documentWidth*0.828, 
+				height: documentWidth*0.828,
+				reverse: true,
+				image: "dial2.png",
+				onready: function() {
+					console.log('ready');
+				},
+				onroundend: function() {
+					if(this.finishDegree > -1) {
+						this.currentDuration = (1+.5)*this.currentDuration;
+					}
+				},
+				onend: function() {
+					console.log('onend');
+				}
+			});
+	/*同步模式
+	document.getElementById('lottery_send').addEventListener('submit', function(e){
+		e.preventDefault();
+		
+		if(myDial.state == 2) {
+			myDial.stop();
+		} else {
+			$.get('result.php?length=6', function(data){
+				console.log('抽奖结果:',data);
+				if(data.status)
+					myDial.start(data.result); //正常的抽奖结果
+				else
+					myDial.reset(); //模拟服务器出错 重置转
+			}, 'json');
+		}
+	});*/
+	/*异步模式*/
+	document.getElementById('lottery_send').addEventListener('submit', function(e){
+		e.preventDefault();
+		
+		if(myDial.state === 2) {
+			myDial.stop();
+			return;
+		}
+		//if(myDial.state !== 1)
+		//	return;
+		myDial.start();
+		$.get('result.php?length=6', function(data){
+			console.log('抽奖结果:',data);
+			if(data.status)
+				myDial.stop(data.result); //正常的抽奖结果
+			else
+				myDial.reset(); //模拟服务器出错 重置转盘
+		}, 'json');
+	})
+	console.log(myDial);
+</script>
+</body>
+</html>

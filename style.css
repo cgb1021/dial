@@ -53,3 +53,16 @@ body {
 	transform: translate(-50%, -50%);
 	opacity:0;
 }
+.pointer {
+	width:82.8%;
+	padding-top:82.8%;
+	background: url(dial2.png) 100% top no-repeat;
+	background-size: auto 100%;
+	position: absolute;
+	left: 50%;
+	top:50%;
+	-webkit-transform: translate(-50%, -50%);
+	-moz-transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+}

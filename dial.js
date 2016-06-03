@@ -25,8 +25,8 @@
    degree: 0 //初始化角度
    duration: 500 //初始化每圈时长
    event: Object //事件 onready,onend,onroundend
-   finishDegree: 初始化角度
-   finishDegree:0 //结束角度
+   startDegree: 初始化角度
+   finishDegree:0 //结束角度 >-1才为有效结束角度
    height: 310.5 //canvas 高度
    image: img //转盘UI背景图
    index: 0 //当前指针指向区间
@@ -43,7 +43,7 @@
 
 ;
 (function(window){
- 	"use strict"
+ 	"use strict";
 	var prefixs = ['webkit', 'moz', 'ms', 'o']; //浏览器前缀
 	var requestAnimationFrame, cancelAnimationFrame;
 	if (!window.requestAnimationFrame) {
@@ -65,7 +65,7 @@
 		cancelAnimationFrame = window.cancelAnimationFrame;
 	}
 /*
- * @param object option
+ * 转盘对象
  */
 function Dial(option) {
 	var canvas = null,
@@ -86,6 +86,7 @@ function Dial(option) {
 	this.rounds = option.rounds || 3; //运行圈数
 	this.length = parseInt(option.length, 10); //区间个数
 	this.startDegree = option.degree || 0; //起始角度
+	this.reverse = !!option.reverse;
 	canvas.style.cssText = 'background-image:url('+option.image+'); background-size:auto 100%; background-repeat:no-repeat; background-position:100% top;';
 
 	// 设置高宽度和获取context
@@ -116,6 +117,9 @@ function Dial(option) {
 	};
 	this.image.src = option.image;
 };
+/*
+* 重置
+*/
 Dial.prototype.reset = function() {
 	this.state = 1; //运行状态 0:未初始化,1:正常状态(初始化完毕),2:运行中(转动中),3:准备停止(调用stop方法)
 	if(this.animationId)
@@ -138,6 +142,10 @@ Dial.prototype.reset = function() {
 		alert(e.message)
 	}
 };
+/*
+ * 开始
+ * @param int index 可选参数。如果传入index值，转盘会在达到圈数后，停止于index区域
+ */
 Dial.prototype.start = function(index) {
 	if(this.state !== 1) {
 		//非正常状态 返回 (未初始化或者运行中)
@@ -205,6 +213,10 @@ Dial.prototype.start = function(index) {
 	};
 	draw();
 };
+/*
+ * 开始
+ * @param int index 可选参数。如果传入index值，转盘会在rounds设定的圈数后，停止于index区域
+ */
 Dial.prototype.stop = function(index) {
 	if(this.state !== 2) {
 		//非运行状态 返回
